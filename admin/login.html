@@ -60,6 +60,7 @@
   <script>
     $(function () {
       $('.input_sub').on('click', function (e) {
+        // 阻止默认行为
         e.preventDefault();
         var userName = $('.input_txt').val().trim();
         var userPwd = $('.input_pass').val().trim();
@@ -79,10 +80,12 @@
             $('#myModal').modal();
             $('.modal-body').text(res.msg);
             // console.log(res);
+            // 如果登录成功之后，将令牌token存储到本地
             if (res.code === 200) {
-              window.localStorage.getItem('token', res.token);
+              window.localStorage.setItem('token', res.token);
+              // 模态框动画完全消失之后执行函数，跳转到首页
               $('#myModal').on('hidden.bs.modal', function (e) {
-                window.location.href = 'index.html'
+                location.href = './index.html';
               })
             }
           }
