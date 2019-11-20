@@ -34,7 +34,7 @@
                             class="iconfont icon-previewright"></i><span>文章列表</span></a></li>
                 <li><a href="./article_edit.html" target="main_frame"><i
                             class="iconfont icon-previewright"></i><span>发表文章</span></a></li>
-                <li><a href="./article_release.html" target="main_frame"><i
+                <li><a href="./article_category.html" target="main_frame"><i
                             class="iconfont icon-previewright"></i><span>文章类别管理</span></a>
                 </li>
             </ul>
@@ -74,13 +74,24 @@
                 // 点击退出，清除本地存储的令牌token
                 window.localStorage.removeItem('token');
                 location.href = './login.html';
+            });
+            // 给level01添加点击事件
+            $('div.level01').on('click', function () {
+                // 排他思想，点击效果
+                $(this).addClass('active').siblings().removeClass('active');
+                //    点击到第二个的时候
+                if ($(this).index() === 1) {
+                    $('.level02').toggle();
+                    // 因为jQuery对象不能这样去触发a标签的默认跳转时间，只有a标签的原生DOM对象才会再点击的时候触发a标签的默认跳转行为
+                    $('.level02 li:eq(0)>a')[0].click();
+                    $(this).find('b').toggleClass('rotate0');
+                }
+            });
+            点击
+            $('.level02 li').on('click', function () {
+                $(this).addClass('active').siblings('li').removeClass('active')
             })
-
-
-
-
         })
-
 
 
     </script>
