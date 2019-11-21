@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="css/main.css">
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <script src="./libs/template-web.js"></script>
+  <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+  <script src="./libs/jquery.twbsPagination.js"></script>
 </head>
 
 <body>
@@ -32,7 +34,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <!-- <tr>
             <td>小周</td>
             <td>这是一条测试评论，欢迎光临</td>
             <td>《世界，你好》</td>
@@ -138,11 +140,11 @@
               <a href="javascript:editTr( 'rejected',11 );" class="btn btn-warning btn-xs">拒绝</a>
               <a href="javascript:editTr( 'trashed',11 );" class="btn btn-danger btn-xs">删除</a>
             </td>
-          </tr>
+          </tr> -->
         </tbody>
       </table>
       <div class="row text-center">
-        <ul class="pagination pagination-sm">
+        <!-- <ul class="pagination pagination-sm">
           <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
           <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
           <li class="page-item active"><a href="#" class="page-link">1</a></li>
@@ -154,12 +156,165 @@
           <li class="page-item"><a href="#" class="page-link">7</a></li>
           <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
           <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
-        </ul>
-        <ul id="pagination" class="pagination-sm"></ul>
+        </ul> -->
+        <ul id="pagination-demo" class="pagination-sm"></ul>
       </div>
 
     </div>
   </div>
+  <script src="./libs/http.js"></script>
+  <script type="text/html" id="list">
+  {{each data.data}}
+    <tr>
+      <td>{{$value.author}}</td>
+      <td>{{$value.content}}</td>
+      <td>{{$value.title}}</td>
+      <td>{{$value.date}}&nbsp{{$value.time}}</td>
+      <td>{{$value.state}}</td>
+      <td class="text-center">
+        {{if $value.state==='待审核'}}
+        <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-info btn-xs" id='pass' >批准</a>
+        <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-warning btn-xs" id="reject">拒绝</a>
+        {{else}}
+        <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-danger btn-xs" id="delete">删除</a>
+        {{/if}}
+       
+      </td>
+    </tr>
+  {{/each}}
+  </script>
+  <script>
+    $(function () {
+      var pages = 1;
+      var perpage = 10;
+      $.get({
+        url: BigNew.comment_list,
+        data: {
+          page: pages,
+          perpage: perpage
+        },
+        success: function (res) {
+          // console.log(res);
+          var htmlStr = template('list', res);
+          $("tbody").html(htmlStr);
+          $('#pagination-demo').twbsPagination({
+            // 总的页码数量
+            totalPages: res.data.totalPage,
+            // 单页显示数量
+            visiblePages: 10,
+            first: '首页',
+            prev: '上一页',
+            next: '下一页',
+            last: '尾页',
+            // 点击事件，点击那一页就跳转到那一页
+            onPageClick: function (event, page) {
+              pages = page;
+              // 重新渲染页面
+              $.get({
+                url: BigNew.comment_list,
+                data: {
+                  page: pages,
+                  perpage: perpage
+                },
+                success: function (res) {
+                  // console.log(res);
+                  var htmlStr = template('list', res);
+                  $("tbody").html(htmlStr);
+                }
+              })
+            }
+          })
+        }
+      });
+
+      // 给删除按钮绑定事件
+      $("tbody").on('click', '#delete', function () {
+        if (confirm('Are you sure?')) {
+          $.post({
+            url: BigNew.comment_delete,
+            data: {
+              id: $(this).attr('data-id')
+            },
+            success: function (res) {
+              // console.log(res);
+              $.get({
+                url: BigNew.comment_list,
+                data: {
+                  page: pages,
+                  perpage: perpage
+                },
+                success: function (res) {
+                  // console.log(res);
+                  if (res.data.data.length === 0) $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, pages - 1);
+                  var htmlStr = template('list', res);
+                  $("tbody").html(htmlStr);
+                }
+              })
+            }
+          })
+        }
+      });
+
+      // 批准
+      $("tbody").on('click', '#pass', function () {
+        if (confirm('确定批准此评论吗？')) {
+          $.post({
+            url: BigNew.comment_pass,
+            data: {
+              id: $(this).attr('data-id')
+            },
+            success: function (res) {
+              $.get({
+                url: BigNew.comment_list,
+                data: {
+                  page: pages,
+                  perpage: perpage
+                },
+                success: function (res) {
+                  // console.log(res);
+                  var htmlStr = template('list', res);
+                  $("tbody").html(htmlStr);
+                }
+              })
+            }
+          })
+        }
+      });
+
+      // 拒绝
+      $("tbody").on('click', '#reject', function () {
+        if (confirm('确定拒绝此评论吗？')) {
+          $.post({
+            url: BigNew.comment_reject,
+            data: {
+              id: $(this).attr('data-id')
+            },
+            success: function (res) {
+              $.get({
+                url: BigNew.comment_list,
+                data: {
+                  page: pages,
+                  perpage: perpage
+                },
+                success: function (res) {
+                  // console.log(res);
+                  var htmlStr = template('list', res);
+                  $("tbody").html(htmlStr);
+                }
+              })
+            }
+          })
+        }
+      });
+
+
+
+
+
+    })
+
+  </script>
+
 </body>
 
 </html>

@@ -224,6 +224,8 @@
                                 },
                                 // 渲染页面
                                 success: function (res) {
+                                    if (res.data.data.length === 0)
+                                        $('#pagination-demo').twbsPagination('changeTotalPages', res.data.totalPage, pages - 1);
                                     var htmlStr = template('main-l', res);
                                     $('tbody').html(htmlStr)
                                 }
