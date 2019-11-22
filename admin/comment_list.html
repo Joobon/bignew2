@@ -165,21 +165,30 @@
   <script src="./libs/http.js"></script>
   <script type="text/html" id="list">
   {{each data.data}}
-    <tr>
+  {{if $value.state==='待审核'}}
+    <tr style="background-color:pink">
       <td>{{$value.author}}</td>
       <td>{{$value.content}}</td>
       <td>{{$value.title}}</td>
       <td>{{$value.date}}&nbsp{{$value.time}}</td>
       <td>{{$value.state}}</td>
-      <td class="text-center">
-        {{if $value.state==='待审核'}}
+      <td class="text-center">     
         <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-info btn-xs" id='pass' >批准</a>
         <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-warning btn-xs" id="reject">拒绝</a>
+      </td>
         {{else}}
-        <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-danger btn-xs" id="delete">删除</a>
+        <tr>
+            <td>{{$value.author}}</td>
+            <td>{{$value.content}}</td>
+            <td>{{$value.title}}</td>
+            <td>{{$value.date}}&nbsp{{$value.time}}</td>
+            <td>{{$value.state}}</td>
+            <td class="text-center">
+              <a href="javascript:void(0);;" data-id="{{$value.id}}" class="btn btn-danger btn-xs" id="delete">删除</a>
+            </td>
         {{/if}}
        
-      </td>
+      
     </tr>
   {{/each}}
   </script>
